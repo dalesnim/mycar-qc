@@ -1,47 +1,44 @@
-# mycar
+# MyCar — контроль качества кузова
 
-This template should help get you started developing with Vue 3 in Vite.
+Учебный проект (летняя практика). Страница для отметки дефектов кузова машины:
+кликаешь по карте кузова — появляется метка, заполняешь карточку дефекта,
+следишь за статусами в списке и сводке.
 
-## Recommended IDE Setup
+## Что умеет
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- SVG-карта кузова, дефект добавляется кликом по карте
+- Карточка дефекта: тип (из справочника), зона, серьёзность, комментарий
+- Валидация: тип и зона обязательны, иначе показываются ошибки
+- Список дефектов с фильтрами по типу и статусу, синхронизирован с картой
+- Статусы дефекта работают как конечный автомат (FSM):
+  `new → in_repair → resolved / rejected`
+  (resolved и rejected — конечные, из них перейти никуда нельзя)
+- Сводка: сколько дефектов в каждом статусе
 
-## Recommended Browser Setup
+Всё состояние хранится в памяти (без бекенда и БД — они будут позже).
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## Стек
 
-## Type Support for `.vue` Imports in TS
+Vue 3 + TypeScript + Vite, тесты на Vitest.
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## Структура
 
-## Customize configuration
+- `src/type.ts` — типы (Defect, Status, Severity)
+- `src/data.ts` — справочник типов дефектов
+- `src/store.ts` — состояние (defects, selectedId)
+- `src/validation.ts` — validateDefect
+- `src/fsm.ts` — переходы статусов и canTransition
+- `src/components/` — CarMap, DefectCard, DefectList, StatusSummary
+- `src/__tests__/` — юнит тесты на FSM и валидацию
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## Как запустить
 
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+## Тесты
 
 ```sh
 npm run test:unit
