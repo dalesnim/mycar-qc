@@ -1,9 +1,8 @@
+<script setup lang="ts">
+import { defects, selectedId } from '../store'
 
-
-<script setup lang = "ts">
-import {defects,selectedId} from '../store'
-function onMapClick(e: MouseEvent){
-     defects.value.push({
+function onMapClick(e: MouseEvent) {
+  defects.value.push({
     id: crypto.randomUUID(),
     vin: 'VIN1',
     x: e.offsetX,
@@ -14,7 +13,6 @@ function onMapClick(e: MouseEvent){
     status: 'new',
     comment: '',
   })
-  console.log(defects.value.length)
 }
 </script>
 
@@ -29,8 +27,8 @@ function onMapClick(e: MouseEvent){
     <path d="M 70 160 L 230 160 L 210 230 L 90 230 Z"
           fill="#bcd6e4" stroke="#333" stroke-width="2" />
    
-    <rect x="85" y="235"
-    fill="#dcdcdc" stroke="#333" stroke-width="2" />
+    <rect x="85" y="235" width="130" height="160"
+          fill="#dcdcdc" stroke="#333" stroke-width="2" />
    
     <path d="M 90 400 L 210 400 L 230 460 L 70 460 Z"
           fill="#bcd6e4" stroke="#333" stroke-width="2" />

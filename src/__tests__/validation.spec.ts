@@ -34,4 +34,9 @@ describe('validateDefect', () => {
   it('пустой дефект — сразу две ошибки', () => {
     expect(validateDefect(makeDefect('', '')).length).toBe(2)
   })
+
+  it('зона из одних пробелов не считается заполненой', () => {
+    const errors = validateDefect(makeDefect('   ', 'scratch'))
+    expect(errors).toContain('Укажите зону')
+  })
 })

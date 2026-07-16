@@ -30,46 +30,45 @@ function removeDefect() {
 </script>
 
 <template>
-    <div v-if="selectedId">
+  <div v-if="defect">
     <h2>Дефект</h2>
-    <p v-if="defect">координаты: {{ defect.x }}, {{ defect.y }}</p>
+    <p>координаты: {{ defect.x }}, {{ defect.y }}</p>
     <label>
-  Зона:
-  <input v-model="defect.zone" v-if="defect" />
-</label>
-<label v-if="defect">
-  Тип:
-  <select v-model="defect.typeId">
-    <option v-for="t in defectTypes" :key="t.id" :value="t.id">
-      {{ t.name }}
-    </option>
-  </select>
-</label>
-<label v-if="defect">
-  Серьезность:
-  <select v-model="defect.severity">
-    <option value="low">low</option>
-    <option value="high">high</option>
-    <option value="critical">critical</option>
-  </select>
-</label>
+      Зона:
+      <input v-model="defect.zone" />
+    </label>
+    <label>
+      Тип:
+      <select v-model="defect.typeId">
+        <option v-for="t in defectTypes" :key="t.id" :value="t.id">
+          {{ t.name }}
+        </option>
+      </select>
+    </label>
+    <label>
+      Серьезность:
+      <select v-model="defect.severity">
+        <option value="low">low</option>
+        <option value="high">high</option>
+        <option value="critical">critical</option>
+      </select>
+    </label>
+    <label>
+      Комментарий:
+      <input v-model="defect.comment" />
+    </label>
 
-<label>
-  Комментарий:
-  <input v-model="defect.comment" v-if="defect" />
-</label>
+    <p>Статус: {{ defect.status }}</p>
+    <div>
+      <button v-for="s in nextStatuses" :key="s" @click="changeStatus(s)">
+        перевести в {{ s }}
+      </button>
+      <span v-if="nextStatuses.length === 0">это конечный статус</span>
+    </div>
 
-<p v-if="defect">Статус: {{ defect.status }}</p>
-<div v-if="defect">
-  <button v-for="s in nextStatuses" :key="s" @click="changeStatus(s)">
-    перевисти в {{ s }}
-  </button>
-  <span v-if="nextStatuses.length === 0">это конечный статус</span>
-</div>
-
-<button v-if="defect" @click="removeDefect">Удалить</button>
-<ul v-if="errors.length > 0">
-  <li v-for="err in errors" :key="err">{{ err }}</li>
-</ul>
+    <button @click="removeDefect">Удалить</button>
+    <ul v-if="errors.length > 0">
+      <li v-for="err in errors" :key="err">{{ err }}</li>
+    </ul>
   </div>
 </template>
