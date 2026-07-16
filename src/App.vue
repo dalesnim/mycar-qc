@@ -2,6 +2,7 @@
 import CarMap from './components/CarMap.vue'
 import DefectCard from './components/DefectCard.vue'
 import DefectList from './components/DefectList.vue'
+import StatusSummary from './components/StatusSummary.vue'
 </script>
 
 
@@ -10,6 +11,7 @@ import DefectList from './components/DefectList.vue'
 <CarMap />
 <DefectCard />
 <DefectList/>
+<StatusSummary/>
 </template>
 
 <style>
