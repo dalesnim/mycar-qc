@@ -2,10 +2,18 @@
 import {defects,selectedId} from "../store"
 import {computed} from 'vue'
 import { defectTypes } from '../data'
+import { validateDefect } from '../validation'
 
 const defect = computed(() =>
   defects.value.find(d => d.id === selectedId.value)
 )
+
+const errors = computed(() => defect.value ? validateDefect(defect.value) : [])
+
+function removeDefect() {
+  defects.value = defects.value.filter(d => d.id !== selectedId.value)
+  selectedId.value = null
+}
 </script>
 
 <template>
@@ -24,6 +32,23 @@ const defect = computed(() =>
     </option>
   </select>
 </label>
-  </div>
+<label v-if="defect">
+  Серьезность:
+  <select v-model="defect.severity">
+    <option value="low">low</option>
+    <option value="high">high</option>
+    <option value="critical">critical</option>
+  </select>
+</label>
 
+<label>
+  Комментарий:
+  <input v-model="defect.comment" v-if="defect" />
+</label>
+
+<button v-if="defect" @click="removeDefect">Удалить</button>
+<ul v-if="errors.length > 0">
+  <li v-for="err in errors" :key="err">{{ err }}</li>
+</ul>
+  </div>
 </template>
