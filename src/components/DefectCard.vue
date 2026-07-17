@@ -36,7 +36,7 @@ function remove() {
 </script>
 
 <template>
-  <div v-if="defect">
+  <div v-if="defect" class="card">
     <h2>Дефект</h2>
     <p>координаты: {{ defect.x }}, {{ defect.y }}</p>
     <label>
@@ -79,11 +79,29 @@ function remove() {
     <button @click="remove">Удалить</button>
     <p v-if="savedMessage">{{ savedMessage }}</p>
 
-    <ul v-if="errors.length > 0">
+    <ul v-if="errors.length > 0" class="errors">
       <li v-for="err in errors" :key="err">{{ err }}</li>
     </ul>
-    <ul v-if="serverErrors.length > 0">
+    <ul v-if="serverErrors.length > 0" class="errors">
       <li v-for="err in serverErrors" :key="err">{{ err }}</li>
     </ul>
   </div>
 </template>
+
+<style scoped>
+.card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+.card h2 {
+  margin-top: 0;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+}
+.errors {
+  color: red;
+}
+</style>

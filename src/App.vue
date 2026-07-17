@@ -23,6 +23,15 @@ onMounted(loadAll)
 </template>
 
 <style>
+body {
+  font-family: Arial, sans-serif;
+  background: white;
+  color: black;
+  margin: 20px;
+}
+h1 {
+  font-size: 24px;
+}
 .layout {
   display: flex;
   gap: 40px;
@@ -30,5 +39,13 @@ onMounted(loadAll)
 }
 .panel {
   flex: 1;
+  max-width: 500px;
+}
+button {
+  margin-right: 5px;
+  margin-top: 5px;
+}
+select {
+  margin-right: 5px;
 }
 </style>
