@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { createDb } from './db.js'
+import { pdiHtml } from './report.js'
 
 export function createApp(file) {
   const app = express()
@@ -35,6 +36,10 @@ export function createApp(file) {
   app.post('/defect-types', (req, res) => {
     const result = db.addType(req.body)
     res.status(result.status).json(result.body)
+  })
+
+  app.get('/inspections/:vin/pdi-report', (req, res) => {
+    res.send(pdiHtml(req.params.vin, db.list(req.params.vin), db.types()))
   })
 
   return app
