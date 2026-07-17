@@ -2,7 +2,8 @@
 
 Учебный проект (летняя практика). Страница для отметки дефектов кузова машины:
 кликаешь по карте кузова — появляется метка, заполняешь карточку дефекта,
-следишь за статусами в списке и сводке.
+следишь за статусами в списке и сводке. Дефекты хранятся на сервере
+и переживают перезагрузку страницы и перезапуск сервера.
 
 ## Что умеет
 
@@ -14,32 +15,80 @@
   `new → in_repair → resolved / rejected`
   (resolved и rejected — конечные, из них перейти никуда нельзя)
 - Сводка: сколько дефектов в каждом статусе
-
-Всё состояние хранится в памяти (без бекенда и БД — они будут позже).
+- API-сервер (Express): дефекты создаются/меняются/удаляются через запросы,
+  валидация и FSM продублированы на сервере
+- Персистентность: сервер сохраняет всё в `server/data.json`,
+  после перезапуска данные на месте
+- Отчёт PDI по кузову: таблица дефектов и итог «годен / не годен к выдаче»
+  (годен, если нет дефектов в статусах new и in_repair)
 
 ## Стек
 
-Vue 3 + TypeScript + Vite, тесты на Vitest.
+Фронт: Vue 3 + TypeScript + Vite. Сервер: Node + Express. Тесты: Vitest.
 
 ## Структура
 
 - `src/type.ts` — типы (Defect, Status, Severity)
-- `src/data.ts` — справочник типов дефектов
-- `src/store.ts` — состояние (defects, selectedId)
+- `src/store.ts` — состояние и запросы к API
 - `src/validation.ts` — validateDefect
 - `src/fsm.ts` — переходы статусов и canTransition
+- `src/summary.ts` — подсчёт сводки
 - `src/components/` — CarMap, DefectCard, DefectList, StatusSummary
-- `src/__tests__/` — юнит тесты на FSM и валидацию
+- `src/__tests__/` — тесты фронта
+- `server/` — API-сервер (app, db, rules, storage, report)
+- `server/__tests__/` — тесты сервера
 
 ## Как запустить
 
+Нужно два терминала: один для сервера, второй для фронта.
+
 ```sh
 npm install
+npm run server
+```
+
+и во втором терминале:
+
+```sh
 npm run dev
 ```
+
+Фронт откроется на http://localhost:5173, сервер на http://localhost:3000.
+
+## Эндпоинты API
+
+| Метод | Путь | Что делает |
+|---|---|---|
+| GET | /defects?vin=XXX | список дефектов (можно фильтр по vin) |
+| POST | /defects | создать дефект |
+| PATCH | /defects/{id} | изменить дефект (в т.ч. статус) |
+| DELETE | /defects/{id} | удалить дефект |
+| GET | /defect-types | справочник типов |
+| POST | /defect-types | добавить тип |
+| GET | /inspections/{vin}/pdi-report | отчёт PDI (HTML-страница) |
+
+Примеры:
+
+```sh
+curl http://localhost:3000/defects?vin=VIN1
+
+curl -X POST http://localhost:3000/defects \
+  -H "Content-Type: application/json" \
+  -d '{"vin":"VIN1","zone":"капот","x":100,"y":80,"typeId":"d1","severity":"high","comment":"скол"}'
+
+curl -X PATCH http://localhost:3000/defects/{id} \
+  -H "Content-Type: application/json" \
+  -d '{"status":"in_repair"}'
+```
+
+Ошибки: создание без типа/зоны — 400, недопустимый переход статуса — 400,
+несуществующий id — 404.
 
 ## Тесты
 
 ```sh
 npm run test:unit
 ```
+
+Тесты фронта: FSM, валидация, сводка. Тесты сервера: создание/изменение/удаление,
+валидация на сервере, сохранение и чтение после перезапуска, отчёт PDI.
