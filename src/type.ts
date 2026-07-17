@@ -18,4 +18,5 @@ export interface Defect{
     severity: Severity
     status: Status
     comment?: string
+    createdAt?: string
 }

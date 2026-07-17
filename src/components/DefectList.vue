@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import {defects,selectedId} from '../store'
+import { defects, selectedId, defectTypes } from '../store'
 import { ref, computed } from 'vue'
-import { defectTypes } from '../data'
 
 const filterType = ref('')
 const filterStatus = ref('')

@@ -2,8 +2,9 @@
 import { defects, selectedId } from '../store'
 
 function onMapClick(e: MouseEvent) {
+  const id = 'tmp-' + Date.now()
   defects.value.push({
-    id: crypto.randomUUID(),
+    id: id,
     vin: 'VIN1',
     x: e.offsetX,
     y: e.offsetY,
@@ -13,6 +14,7 @@ function onMapClick(e: MouseEvent) {
     status: 'new',
     comment: '',
   })
+  selectedId.value = id
 }
 </script>
 
