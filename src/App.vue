@@ -11,13 +11,24 @@ onMounted(loadAll)
 
 <template>
 <h1> My Car Quality Control </h1>
-<CarMap />
-<DefectCard />
-<DefectList/>
-<StatusSummary/>
-<a href="http://localhost:3000/inspections/VIN1/pdi-report" target="_blank">Отчёт PDI</a>
+<div class="layout">
+  <CarMap />
+  <div class="panel">
+    <DefectCard />
+    <DefectList/>
+    <StatusSummary/>
+    <a href="http://localhost:3000/inspections/VIN1/pdi-report" target="_blank">Отчёт PDI</a>
+  </div>
+</div>
 </template>
 
 <style>
-
+.layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+.panel {
+  flex: 1;
+}
 </style>
