@@ -66,7 +66,7 @@ function remove() {
 
     <p>Статус: {{ defect.status }}</p>
     <div v-if="isDraft(defect)">
-      <p>сначала сохрани дефект чтобы менять статус</p>
+      <p>Сохраните дефект чтобы менять статус</p>
     </div>
     <div v-else>
       <button v-for="s in nextStatuses" :key="s" @click="setStatus(s)">

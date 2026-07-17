@@ -14,7 +14,7 @@ const filtered = computed(() =>
 
 <template>
     <select v-model="filterStatus">
-  <option value="">все статусы</option>
+  <option value="">Все статусы</option>
   <option value="new">new</option>
   <option value="in_repair">in_repair</option>
   <option value="resolved">resolved</option>
@@ -22,7 +22,7 @@ const filtered = computed(() =>
 </select>
 
 <select v-model="filterType">
-  <option value="">все типы</option>
+  <option value="">Все типы</option>
   <option v-for="t in defectTypes" :key="t.id" :value="t.id">
     {{ t.name }}
   </option>

@@ -16,7 +16,7 @@ const summary = computed(() => countByStatus(defects.value))
       <li v-for="s in statuses" :key="s">
         {{ s }}: {{ summary[s] }}
       </li>
-      <li>всего: {{ defects.length }}</li>
+      <li>Всего: {{ defects.length }}</li>
     </ul>
   </div>
 </template>
