@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import { validateDefect } from '../validation'
 import type { Defect } from '../type'
 
-// вспомогательная функция чтобы не писать весь дефект каждый раз
 function makeDefect(zone: string, typeId: string): Defect {
   return {
     id: '1',
@@ -35,7 +34,7 @@ describe('validateDefect', () => {
     expect(validateDefect(makeDefect('', '')).length).toBe(2)
   })
 
-  it('зона из одних пробелов не считается заполненой', () => {
+  it('зона из одних пробелов не считается заполненной', () => {
     const errors = validateDefect(makeDefect('   ', 'scratch'))
     expect(errors).toContain('Укажите зону')
   })

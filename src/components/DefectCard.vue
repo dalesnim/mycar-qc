@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { defects, selectedId, defectTypes, isDraft, saveDefect, changeStatus, removeDefect } from '../store'
+import { defects, selectedId, defectTypes, draft, saveDefect, changeStatus, removeDefect, role } from '../store'
 import { validateDefect } from '../validation'
 import { transitions } from '../fsm'
 import type { Status } from '../type'
 
 const defect = computed(() =>
-  defects.value.find((d) => d.id === selectedId.value)
+  draft.value || defects.value.find((d) => d.id === selectedId.value)
 )
 
 const errors = computed(() => (defect.value ? validateDefect(defect.value) : []))
@@ -30,14 +30,15 @@ async function setStatus(to: Status) {
   serverErrors.value = await changeStatus(defect.value, to)
 }
 
-function remove() {
-  if (defect.value) removeDefect(defect.value)
+async function remove() {
+  if (!defect.value) return
+  serverErrors.value = await removeDefect(defect.value)
 }
 </script>
 
 <template>
   <div v-if="defect" class="card">
-    <h2>Дефект</h2>
+    <h2>{{ draft ? 'Новый дефект' : 'Дефект' }}</h2>
     <p>координаты: {{ defect.x }}, {{ defect.y }}</p>
     <label>
       Зона:
@@ -64,19 +65,21 @@ function remove() {
       <input v-model="defect.comment" @input="savedMessage = ''" />
     </label>
 
-    <p>Статус: {{ defect.status }}</p>
-    <div v-if="isDraft(defect)">
-      <p>Сохраните дефект чтобы менять статус</p>
-    </div>
-    <div v-else>
-      <button v-for="s in nextStatuses" :key="s" @click="setStatus(s)">
-        перевести в {{ s }}
-      </button>
-      <span v-if="nextStatuses.length === 0">это конечный статус</span>
-    </div>
+    <template v-if="!draft">
+      <p>Статус: <span class="badge" :class="defect.status">{{ defect.status }}</span></p>
+      <div v-if="role === 'master'">
+        <button v-for="s in nextStatuses" :key="s" @click="setStatus(s)">
+          перевести в {{ s }}
+        </button>
+        <span v-if="nextStatuses.length === 0">это конечный статус</span>
+      </div>
+      <p v-else>Статусы ремонта переводит мастер</p>
+    </template>
 
-    <button @click="save">Сохранить</button>
-    <button @click="remove">Удалить</button>
+    <template v-if="role === 'inspector'">
+      <button @click="save">Сохранить</button>
+      <button @click="remove">{{ draft ? 'Отмена' : 'Удалить' }}</button>
+    </template>
     <p v-if="savedMessage">{{ savedMessage }}</p>
 
     <ul v-if="errors.length > 0" class="errors">
@@ -90,6 +93,7 @@ function remove() {
 
 <style scoped>
 .card {
+  background: white;
   border: 1px solid #ccc;
   padding: 15px;
   margin-bottom: 15px;

@@ -15,7 +15,7 @@ describe('canTransition', () => {
     expect(canTransition('in_repair', 'rejected')).toBe(true)
   })
 
-  it('resolved и rejected конечные статусы, из них никуда нелья', () => {
+  it('resolved и rejected конечные статусы, из них никуда нельзя', () => {
     expect(transitions.resolved).toEqual([])
     expect(transitions.rejected).toEqual([])
     expect(canTransition('resolved', 'new')).toBe(false)
