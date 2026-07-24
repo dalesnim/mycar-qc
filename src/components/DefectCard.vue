@@ -43,7 +43,7 @@ async function remove() {
     <p class="coords">координаты: {{ defect.x }}, {{ defect.y }}</p>
     <label>
       Зона
-      <input v-model="defect.zone" placeholder="например капот" @input="savedMessage = ''" />
+      <input v-model="defect.zone" @input="savedMessage = ''" />
     </label>
     <label>
       Тип
