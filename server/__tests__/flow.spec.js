@@ -15,7 +15,7 @@ const goodDefect = {
 }
 
 describe('умный пользователь: делает всё правильно и по порядку', () => {
-  it('инспектор создал -> мастер отремонтировал -> чек-лист пройден -> кузов годен', () => {
+  it('инспектор создал -> мастер отремонтировал -> кузов годен', () => {
     const db = createDb()
     const created = db.create(goodDefect, 'inspector')
     expect(created.status).toBe(201)
@@ -24,13 +24,7 @@ describe('умный пользователь: делает всё правил�
     expect(db.update(id, { status: 'in_repair' }, 'master').status).toBe(200)
     expect(db.update(id, { status: 'resolved' }, 'master').status).toBe(200)
 
-    const beforeChecklist = pdiSummary(db.list('VIN1'), db.getChecklist('VIN1'))
-    expect(beforeChecklist.fit).toBe(false)
-
-    const allPass = db.getChecklist('VIN1').map((c) => ({ ...c, result: 'pass' }))
-    expect(db.saveChecklist('VIN1', allPass, 'inspector').status).toBe(200)
-
-    const summary = pdiSummary(db.list('VIN1'), db.getChecklist('VIN1'))
+    const summary = pdiSummary(db.list('VIN1'))
     expect(summary.fit).toBe(true)
     expect(summary.resolved).toBe(1)
   })

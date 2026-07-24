@@ -4,14 +4,11 @@ import CarMap from './components/CarMap.vue'
 import DefectCard from './components/DefectCard.vue'
 import DefectList from './components/DefectList.vue'
 import StatusSummary from './components/StatusSummary.vue'
-import PdiChecklist from './components/PdiChecklist.vue'
-import QualityDashboard from './components/QualityDashboard.vue'
 import { loadAll, role, draft, apiError, user, login, logout } from './store'
 
 const loginName = ref('')
 const password = ref('')
 const loginErrors = ref<string[]>([])
-const showDashboard = ref(false)
 
 onMounted(loadAll)
 
@@ -64,14 +61,7 @@ async function doLogin() {
       <DefectCard />
       <DefectList/>
       <StatusSummary/>
-      <PdiChecklist/>
-      <p>
-        <a href="http://localhost:3000/inspections/VIN1/pdi-report" target="_blank">Отчёт PDI</a>
-        <button class="dash-btn" @click="showDashboard = !showDashboard">
-          {{ showDashboard ? 'скрыть дашборд' : 'Дашборд качества' }}
-        </button>
-      </p>
-      <QualityDashboard v-if="showDashboard" />
+      <a href="http://localhost:3000/inspections/VIN1/pdi-report" target="_blank">Отчёт PDI</a>
     </div>
   </div>
 </template>

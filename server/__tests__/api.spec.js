@@ -3,9 +3,6 @@ import { existsSync, unlinkSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import { createDb } from '../db.js'
 import { pdiSummary } from '../report.js'
-import { checklistItems } from '../rules.js'
-
-const allPass = checklistItems.map((c) => ({ key: c.key, label: c.label, result: 'pass', comment: '' }))
 
 const file = os.tmpdir() + '/mycar-test-' + Date.now() + '.json'
 
@@ -91,14 +88,14 @@ describe('отчёт PDI', () => {
     expect(s.fit).toBe(false)
   })
 
-  it('нет дефектов и чек-лист пройден - годен ДА', () => {
-    const s = pdiSummary([], allPass)
+  it('нет дефектов - годен ДА', () => {
+    const s = pdiSummary([])
     expect(s.total).toBe(0)
     expect(s.fit).toBe(true)
   })
 
-  it('только отклонённые и чек-лист пройден - годен ДА', () => {
-    const s = pdiSummary([{ status: 'rejected' }], allPass)
+  it('только отклонённые - годен ДА', () => {
+    const s = pdiSummary([{ status: 'rejected' }])
     expect(s.fit).toBe(true)
     expect(s.rejected).toBe(1)
   })
