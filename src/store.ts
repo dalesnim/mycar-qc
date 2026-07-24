@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import type { Defect, DefectType, Status } from './type'
 
-const API = 'http://localhost:3000'
+export const API = location.hostname === 'localhost' ? 'http://localhost:3000' : '/api'
 
 export interface User {
   name: string

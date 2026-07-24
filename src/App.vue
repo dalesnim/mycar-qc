@@ -4,7 +4,7 @@ import CarMap from './components/CarMap.vue'
 import DefectCard from './components/DefectCard.vue'
 import DefectList from './components/DefectList.vue'
 import StatusSummary from './components/StatusSummary.vue'
-import { loadAll, role, draft, apiError, user, login, logout } from './store'
+import { loadAll, role, draft, apiError, user, login, logout, API } from './store'
 
 const loginName = ref('')
 const password = ref('')
@@ -61,7 +61,7 @@ async function doLogin() {
       <DefectCard />
       <DefectList/>
       <StatusSummary/>
-      <a href="http://localhost:3000/inspections/VIN1/pdi-report" target="_blank">Отчёт PDI</a>
+      <a :href="API + '/inspections/VIN1/pdi-report'" target="_blank">Отчёт PDI</a>
     </div>
   </div>
 </template>
