@@ -4,7 +4,7 @@ import CarMap from './components/CarMap.vue'
 import DefectCard from './components/DefectCard.vue'
 import DefectList from './components/DefectList.vue'
 import StatusSummary from './components/StatusSummary.vue'
-import { loadAll, role, draft, apiError, user, login, logout, API } from './store'
+import { loadAll, role, draft, apiError, user, login, logout, switchRole, API } from './store'
 
 const loginName = ref('')
 const password = ref('')
@@ -15,6 +15,11 @@ onMounted(loadAll)
 watch(role, () => {
   if (role.value !== 'inspector') draft.value = null
 })
+
+function onRoleChange(e: Event) {
+  const value = (e.target as HTMLSelectElement).value
+  switchRole(value === 'master' ? 'master' : 'inspector')
+}
 
 async function doLogin() {
   loginErrors.value = await login(loginName.value, password.value)
@@ -29,7 +34,11 @@ async function doLogin() {
 <div class="header">
   <h1>MyCar - контроль качества</h1>
   <div v-if="user" class="user-info">
-    {{ user.name }} - {{ user.role === 'inspector' ? 'инспектор' : 'мастер' }}
+    {{ user.name }} -
+    <select :value="user.role" @change="onRoleChange">
+      <option value="inspector">инспектор</option>
+      <option value="master">мастер</option>
+    </select>
     <button @click="logout">Выйти</button>
   </div>
 </div>

@@ -44,6 +44,12 @@ export async function login(loginName: string, password: string): Promise<string
   }
 }
 
+export function switchRole(to: 'inspector' | 'master') {
+  if (!user.value) return
+  user.value = { ...user.value, role: to }
+  localStorage.setItem('user', JSON.stringify(user.value))
+}
+
 export function logout() {
   user.value = null
   draft.value = null
