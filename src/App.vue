@@ -41,13 +41,13 @@ async function doLogin() {
   <form @submit.prevent="doLogin">
     <label>
       Логин:
-      <input v-model="loginName" />
+      <input v-model="loginName" autofocus />
     </label>
     <label>
       Пароль:
       <input v-model="password" type="password" />
     </label>
-    <button type="submit">Войти</button>
+    <button type="submit" class="primary">Войти</button>
   </form>
   <ul v-if="loginErrors.length > 0" class="errors">
     <li v-for="err in loginErrors" :key="err">{{ err }}</li>
@@ -61,7 +61,7 @@ async function doLogin() {
       <DefectCard />
       <DefectList/>
       <StatusSummary/>
-      <a :href="API + '/inspections/VIN1/pdi-report'" target="_blank">Отчёт PDI</a>
+      <a class="report-link" :href="API + '/inspections/VIN1/pdi-report'" target="_blank">Открыть отчёт PDI</a>
     </div>
   </div>
 </template>
@@ -124,9 +124,59 @@ button {
   margin-right: 5px;
   margin-top: 5px;
   cursor: pointer;
+  padding: 6px 14px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  background: #eee;
+}
+button:hover {
+  background: #ddd;
+}
+button.primary {
+  background: #5cb85c;
+  border-color: #4cae4c;
+  color: white;
+}
+button.primary:hover {
+  background: #4cae4c;
+}
+button.danger {
+  background: #d9534f;
+  border-color: #c9302c;
+  color: white;
+}
+button.danger:hover {
+  background: #c9302c;
+}
+input, select {
+  padding: 5px 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  background: white;
 }
 select {
   margin-right: 5px;
+}
+.report-link {
+  display: inline-block;
+  background: white;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  padding: 6px 14px;
+  color: #222;
+  text-decoration: none;
+}
+.report-link:hover {
+  background: #eee;
+}
+@media (max-width: 700px) {
+  .layout {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .panel {
+    max-width: 100%;
+  }
 }
 .api-error {
   color: red;

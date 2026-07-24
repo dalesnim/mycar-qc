@@ -32,6 +32,7 @@ async function setStatus(to: Status) {
 
 async function remove() {
   if (!defect.value) return
+  if (!draft.value && !confirm('Точно удалить этот дефект?')) return
   serverErrors.value = await removeDefect(defect.value)
 }
 </script>
@@ -39,21 +40,22 @@ async function remove() {
 <template>
   <div v-if="defect" class="card">
     <h2>{{ draft ? 'Новый дефект' : 'Дефект' }}</h2>
-    <p>координаты: {{ defect.x }}, {{ defect.y }}</p>
+    <p class="coords">координаты: {{ defect.x }}, {{ defect.y }}</p>
     <label>
-      Зона:
-      <input v-model="defect.zone" @input="savedMessage = ''" />
+      Зона
+      <input v-model="defect.zone" placeholder="например капот" @input="savedMessage = ''" />
     </label>
     <label>
-      Тип:
+      Тип
       <select v-model="defect.typeId" @change="savedMessage = ''">
+        <option value="" disabled>выбери тип</option>
         <option v-for="t in defectTypes" :key="t.id" :value="t.id">
           {{ t.name }}
         </option>
       </select>
     </label>
     <label>
-      Серьезность:
+      Серьезность
       <select v-model="defect.severity" @change="savedMessage = ''">
         <option value="low">low</option>
         <option value="high">high</option>
@@ -61,8 +63,8 @@ async function remove() {
       </select>
     </label>
     <label>
-      Комментарий:
-      <input v-model="defect.comment" @input="savedMessage = ''" />
+      Комментарий
+      <input v-model="defect.comment" placeholder="необязательно" @input="savedMessage = ''" />
     </label>
 
     <template v-if="!draft">
@@ -71,16 +73,17 @@ async function remove() {
         <button v-for="s in nextStatuses" :key="s" @click="setStatus(s)">
           перевести в {{ s }}
         </button>
-        <span v-if="nextStatuses.length === 0">это конечный статус</span>
+        <span v-if="nextStatuses.length === 0" class="hint-text">это конечный статус</span>
       </div>
-      <p v-else>Статусы ремонта переводит мастер</p>
+      <p v-else class="hint-text">Статусы ремонта переводит мастер</p>
     </template>
 
-    <template v-if="role === 'inspector'">
-      <button @click="save">Сохранить</button>
-      <button @click="remove">{{ draft ? 'Отмена' : 'Удалить' }}</button>
-    </template>
-    <p v-if="savedMessage">{{ savedMessage }}</p>
+    <div v-if="role === 'inspector'" class="actions">
+      <button class="primary" @click="save">Сохранить</button>
+      <button class="danger" @click="remove">{{ draft ? 'Отмена' : 'Удалить' }}</button>
+      <span v-if="savedMessage" class="saved">{{ savedMessage }}</span>
+    </div>
+    <p v-else-if="savedMessage" class="saved">{{ savedMessage }}</p>
 
     <ul v-if="errors.length > 0" class="errors">
       <li v-for="err in errors" :key="err">{{ err }}</li>
@@ -89,21 +92,55 @@ async function remove() {
       <li v-for="err in serverErrors" :key="err">{{ err }}</li>
     </ul>
   </div>
+  <div v-else class="card hint-card">
+    <p v-if="role === 'inspector'">Кликни по карте кузова чтобы добавить дефект, или выбери его из списка</p>
+    <p v-else>Выбери дефект на карте или в списке чтобы перевести его статус</p>
+  </div>
 </template>
 
 <style scoped>
 .card {
   background: white;
   border: 1px solid #ccc;
+  border-radius: 6px;
   padding: 15px;
   margin-bottom: 15px;
 }
 .card h2 {
   margin-top: 0;
 }
+.coords {
+  color: #888;
+  font-size: 13px;
+  margin-top: -8px;
+}
 label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #555;
+}
+label input,
+label select {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 3px;
+}
+.actions {
+  margin-top: 10px;
+}
+.saved {
+  color: green;
+  margin-left: 8px;
+}
+.hint-text {
+  color: #888;
+  font-size: 14px;
+}
+.hint-card p {
+  color: #888;
+  margin: 5px 0;
 }
 .errors {
   color: red;

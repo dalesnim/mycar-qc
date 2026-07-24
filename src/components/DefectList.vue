@@ -18,56 +18,76 @@ function typeName(typeId: string) {
 </script>
 
 <template>
-    <select v-model="filterStatus">
-  <option value="">Все статусы</option>
-  <option value="new">new</option>
-  <option value="in_repair">in_repair</option>
-  <option value="resolved">resolved</option>
-  <option value="rejected">rejected</option>
-</select>
-
-<select v-model="filterType">
-  <option value="">Все типы</option>
-  <option v-for="t in defectTypes" :key="t.id" :value="t.id">
-    {{ t.name }}
-  </option>
-</select>
+  <div class="list-box">
+    <h2>Дефекты ({{ filtered.length }})</h2>
+    <div class="filters">
+      <select v-model="filterStatus">
+        <option value="">Все статусы</option>
+        <option value="new">new</option>
+        <option value="in_repair">in_repair</option>
+        <option value="resolved">resolved</option>
+        <option value="rejected">rejected</option>
+      </select>
+      <select v-model="filterType">
+        <option value="">Все типы</option>
+        <option v-for="t in defectTypes" :key="t.id" :value="t.id">
+          {{ t.name }}
+        </option>
+      </select>
+    </div>
 
     <ul class="defect-list">
-  <li v-for="d in filtered" :key="d.id" @click="selectedId = d.id"
-    :class="{ selected: d.id === selectedId }">
-    <span>{{ d.zone || 'без зоны' }} - {{ typeName(d.typeId) }} - {{ d.severity }}</span>
-    <span class="badge" :class="d.status">{{ d.status }}</span>
-  </li>
-  <li v-if="filtered.length === 0" class="empty">ничего не найдено</li>
-</ul>
+      <li v-for="d in filtered" :key="d.id" @click="selectedId = d.id"
+        :class="{ selected: d.id === selectedId }">
+        <span>{{ d.zone || 'без зоны' }} - {{ typeName(d.typeId) }} - {{ d.severity }}</span>
+        <span class="badge" :class="d.status">{{ d.status }}</span>
+      </li>
+      <li v-if="filtered.length === 0" class="empty">ничего не найдено</li>
+    </ul>
+  </div>
 </template>
 
 <style scoped>
+.list-box {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+.list-box h2 {
+  margin-top: 0;
+}
+.filters {
+  margin-bottom: 10px;
+}
 .defect-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 .defect-list li {
-  background: white;
-  border: 1px solid #ddd;
-  padding: 6px 10px;
-  margin-bottom: 4px;
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
 }
 .defect-list li:hover {
   background: #f0f0f0;
 }
 .defect-list li.selected {
-  border-color: #0066cc;
-  background: #eaf3ff;
+  background: #e8f0e8;
+  border-color: #5cb85c;
 }
-.defect-list li.empty {
-  cursor: default;
+.empty {
   color: #888;
-  justify-content: center;
+  cursor: default;
+}
+.empty:hover {
+  background: white;
 }
 </style>
