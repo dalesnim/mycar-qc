@@ -8,6 +8,13 @@ export type Severity = 'low' | 'high' | 'critical'
 
 export type Status = 'new' | 'in_repair' | 'resolved' | 'rejected'
  
+export interface ChecklistItem {
+    key: string
+    label: string
+    result: 'pass' | 'fail' | 'na' | ''
+    comment: string
+}
+
 export interface Defect{
     id: string
     vin: string

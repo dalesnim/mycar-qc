@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { defects } from '../store'
+import { defects, checklist } from '../store'
 import { countByStatus, isFit } from '../summary'
 import type { Status } from '../type'
 
 const statuses: Status[] = ['new', 'in_repair', 'resolved', 'rejected']
 
 const summary = computed(() => countByStatus(defects.value))
-const fit = computed(() => isFit(defects.value))
+const fit = computed(() => isFit(defects.value, checklist.value))
 </script>
 
 <template>

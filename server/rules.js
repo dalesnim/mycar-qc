@@ -29,3 +29,26 @@ export function validateDefect(d) {
   }
   return errors
 }
+
+export const checklistItems = [
+  { key: 'paint', label: 'ЛКП (краска)' },
+  { key: 'glass', label: 'Стёкла' },
+  { key: 'lights', label: 'Свет' },
+  { key: 'brakes', label: 'Тормоза' },
+  { key: 'interior', label: 'Салон' },
+]
+
+const checkResults = ['pass', 'fail', 'na']
+
+export function validateChecklist(items) {
+  if (!Array.isArray(items)) return ['Чек-лист должен быть списком пунктов']
+  const errors = []
+  for (const item of items) {
+    if (!item || !checklistItems.find((c) => c.key === item.key)) {
+      errors.push('Неизвестный пункт чек-листа: ' + (item ? item.key : 'пусто'))
+    } else if (!checkResults.includes(item.result)) {
+      errors.push('Результат пункта ' + item.key + ' может быть только pass, fail или na')
+    }
+  }
+  return errors
+}

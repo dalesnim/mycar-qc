@@ -1,5 +1,5 @@
 import { ref, computed, watch } from 'vue'
-import type { Defect, DefectType, Status } from './type'
+import type { Defect, DefectType, Status, ChecklistItem } from './type'
 
 const API = 'http://localhost:3000'
 
@@ -13,6 +13,7 @@ export const defectTypes = ref<DefectType[]>([])
 export const selectedId = ref<string | null>(null)
 export const apiError = ref('')
 export const draft = ref<Defect | null>(null)
+export const checklist = ref<ChecklistItem[]>([])
 
 function savedUser(): User | null {
   try {
@@ -78,12 +79,14 @@ export function startDraft(x: number, y: number) {
 
 export async function loadAll() {
   try {
-    const [d, t] = await Promise.all([
+    const [d, t, c] = await Promise.all([
       fetch(API + '/defects'),
       fetch(API + '/defect-types'),
+      fetch(API + '/inspections/VIN1/checklist'),
     ])
     defects.value = await d.json()
     defectTypes.value = await t.json()
+    checklist.value = await c.json()
     apiError.value = ''
   } catch {
     apiError.value = 'Сервер не отвечает. Запусти его командой npm run server и обнови страницу'
@@ -142,6 +145,22 @@ export async function changeStatus(d: Defect, to: Status): Promise<string[]> {
     const data = await res.json()
     if (!res.ok) return data.errors
     d.status = data.status
+    return []
+  } catch {
+    return noServer
+  }
+}
+
+export async function saveChecklist(): Promise<string[]> {
+  try {
+    const res = await fetch(API + '/inspections/VIN1/checklist', {
+      method: 'PUT',
+      headers: headers(),
+      body: JSON.stringify(checklist.value.filter((c) => c.result !== '')),
+    })
+    const data = await res.json()
+    if (!res.ok) return data.errors
+    checklist.value = data
     return []
   } catch {
     return noServer
