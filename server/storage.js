@@ -7,11 +7,10 @@ export function loadData(file) {
     return {
       defects: Array.isArray(data.defects) ? data.defects : [],
       defectTypes: Array.isArray(data.defectTypes) ? data.defectTypes : null,
-      checklists: data.checklists && typeof data.checklists === 'object' ? data.checklists : {},
     }
   } catch (e) {
     log('не получилось прочитать ' + file + ': ' + e.message + ' (начинаю с пустого списка)')
-    return { defects: [], defectTypes: null, checklists: {} }
+    return { defects: [], defectTypes: null }
   }
 }
 

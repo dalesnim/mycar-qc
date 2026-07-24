@@ -59,21 +59,8 @@ export function createApp(file) {
     res.status(result.status).json(result.body)
   })
 
-  app.get('/inspections/:vin/checklist', (req, res) => {
-    res.json(db.getChecklist(req.params.vin))
-  })
-
-  app.put('/inspections/:vin/checklist', (req, res) => {
-    const result = db.saveChecklist(req.params.vin, req.body, req.headers['x-role'])
-    res.status(result.status).json(result.body)
-  })
-
-  app.get('/analytics/quality', (req, res) => {
-    res.json(db.analytics())
-  })
-
   app.get('/inspections/:vin/pdi-report', (req, res) => {
-    res.send(pdiHtml(req.params.vin, db.list(req.params.vin), db.types(), db.getChecklist(req.params.vin)))
+    res.send(pdiHtml(req.params.vin, db.list(req.params.vin), db.types()))
   })
 
   app.use((req, res) => {

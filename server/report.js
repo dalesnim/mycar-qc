@@ -1,18 +1,9 @@
-import { checklistItems } from './rules.js'
-
-export function isFit(defects, checklist) {
-  const open = defects.some((d) => d.status === 'new' || d.status === 'in_repair')
-  if (open) return false
-  if (!Array.isArray(checklist) || checklist.length < checklistItems.length) return false
-  return checklist.every((c) => c.result === 'pass' || c.result === 'na')
-}
-
-export function pdiSummary(defects, checklist) {
+export function pdiSummary(defects) {
   const total = defects.length
   const resolved = defects.filter((d) => d.status === 'resolved').length
   const rejected = defects.filter((d) => d.status === 'rejected').length
   const open = defects.filter((d) => d.status === 'new' || d.status === 'in_repair').length
-  return { total, resolved, rejected, open, fit: isFit(defects, checklist) }
+  return { total, resolved, rejected, open, fit: open === 0 }
 }
 
 export function escapeHtml(text) {
@@ -23,10 +14,8 @@ export function escapeHtml(text) {
     .replaceAll('"', '&quot;')
 }
 
-const resultNames = { pass: 'пройдено', fail: 'не пройдено', na: 'не применимо' }
-
-export function pdiHtml(vin, defects, types, checklist) {
-  const summary = pdiSummary(defects, checklist)
+export function pdiHtml(vin, defects, types) {
+  const summary = pdiSummary(defects)
   const safeVin = escapeHtml(vin)
 
   function typeName(typeId) {
@@ -43,22 +32,14 @@ export function pdiHtml(vin, defects, types, checklist) {
     )
     .join('')
 
-  const checkRows = (checklist || [])
-    .map(
-      (c) =>
-        '<tr><td>' + escapeHtml(c.label || c.key) + '</td><td>' + escapeHtml(resultNames[c.result] || 'не заполнено') +
-        '</td><td>' + escapeHtml(c.comment || '') + '</td></tr>'
-    )
-    .join('')
-
   return `<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Отчёт PDI - ${safeVin}</title>
+<title>Отчёт PDI — ${safeVin}</title>
 <style>
 body { font-family: sans-serif; margin: 30px; }
-table { border-collapse: collapse; margin-bottom: 20px; }
+table { border-collapse: collapse; }
 td, th { border: 1px solid #999; padding: 4px 10px; }
 .fit { color: green; }
 .notfit { color: red; }
@@ -66,15 +47,9 @@ td, th { border: 1px solid #999; padding: 4px 10px; }
 </head>
 <body>
 <h1>Отчёт PDI по кузову ${safeVin}</h1>
-<h2>Дефекты</h2>
 <table>
 <tr><th>N</th><th>Зона</th><th>Тип</th><th>Серьезность</th><th>Статус</th><th>Комментарий</th><th>Дата</th></tr>
 ${rows || '<tr><td colspan="7">дефектов нет</td></tr>'}
-</table>
-<h2>Чек-лист PDI</h2>
-<table>
-<tr><th>Проверка</th><th>Результат</th><th>Комментарий</th></tr>
-${checkRows || '<tr><td colspan="3">чек-лист не заполнен</td></tr>'}
 </table>
 <p>Всего: ${summary.total}, устранено: ${summary.resolved}, отклонено: ${summary.rejected}, открыто: ${summary.open}</p>
 <h2 class="${summary.fit ? 'fit' : 'notfit'}">

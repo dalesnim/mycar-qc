@@ -1,7 +1,6 @@
 import crypto from 'node:crypto'
 import { loadData, saveData } from './storage.js'
-import { canTransition, validateDefect, validateChecklist, checklistItems } from './rules.js'
-import { isFit } from './report.js'
+import { canTransition, validateDefect } from './rules.js'
 import { log } from './logger.js'
 
 const startTypes = [
@@ -22,13 +21,12 @@ function checkRole(role, needed) {
 }
 
 export function createDb(file) {
-  const data = file ? loadData(file) : { defects: [], defectTypes: null, checklists: {} }
+  const data = file ? loadData(file) : { defects: [], defectTypes: null }
   const defects = data.defects
   const defectTypes = data.defectTypes || [...startTypes]
-  const checklists = data.checklists || {}
 
   function persist() {
-    if (file) saveData(file, { defects, defectTypes, checklists })
+    if (file) saveData(file, { defects, defectTypes })
   }
 
   return {
@@ -108,65 +106,6 @@ export function createDb(file) {
 
     types() {
       return defectTypes
-    },
-
-    getChecklist(vin) {
-      const saved = checklists[vin] || []
-      return checklistItems.map((item) => {
-        const found = saved.find((s) => s.key === item.key)
-        return {
-          key: item.key,
-          label: item.label,
-          result: found ? found.result : '',
-          comment: found ? found.comment : '',
-        }
-      })
-    },
-
-    saveChecklist(vin, items, role) {
-      const roleError = checkRole(role, 'inspector')
-      if (roleError) return roleError
-      const errors = validateChecklist(items)
-      if (errors.length > 0) return { status: 400, body: { errors } }
-      checklists[vin] = items.map((item) => ({
-        key: item.key,
-        result: item.result,
-        comment: typeof item.comment === 'string' ? item.comment : '',
-      }))
-      persist()
-      log('заполнен чек-лист для ' + vin)
-      return { status: 200, body: this.getChecklist(vin) }
-    },
-
-    analytics() {
-      const byType = {}
-      const byZone = {}
-      for (const d of defects) {
-        byType[d.typeId] = (byType[d.typeId] || 0) + 1
-        byZone[d.zone] = (byZone[d.zone] || 0) + 1
-      }
-      const typeName = (id) => {
-        const t = defectTypes.find((t) => t.id === id)
-        return t ? t.name : id
-      }
-      const byTypeList = Object.keys(byType)
-        .map((id) => ({ typeId: id, name: typeName(id), count: byType[id] }))
-        .sort((a, b) => b.count - a.count)
-      const byZoneList = Object.keys(byZone)
-        .map((zone) => ({ zone: zone, count: byZone[zone] }))
-        .sort((a, b) => b.count - a.count)
-
-      const vins = [...new Set([...defects.map((d) => d.vin), ...Object.keys(checklists)])]
-      const fitCount = vins.filter((vin) =>
-        isFit(defects.filter((d) => d.vin === vin), this.getChecklist(vin))
-      ).length
-
-      return {
-        byType: byTypeList,
-        byZone: byZoneList,
-        topZones: byZoneList.slice(0, 3),
-        passRate: vins.length === 0 ? null : fitCount / vins.length,
-      }
     },
 
     addType(body, role) {
