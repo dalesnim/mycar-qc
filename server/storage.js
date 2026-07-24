@@ -1,13 +1,15 @@
 import fs from 'node:fs'
+import { log } from './logger.js'
 
 export function loadData(file) {
   try {
     const data = JSON.parse(fs.readFileSync(file, 'utf-8'))
     return {
-      defects: data.defects || [],
-      defectTypes: data.defectTypes || null,
+      defects: Array.isArray(data.defects) ? data.defects : [],
+      defectTypes: Array.isArray(data.defectTypes) ? data.defectTypes : null,
     }
-  } catch {
+  } catch (e) {
+    log('не получилось прочитать ' + file + ': ' + e.message + ' (начинаю с пустого списка)')
     return { defects: [], defectTypes: null }
   }
 }

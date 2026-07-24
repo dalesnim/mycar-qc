@@ -6,8 +6,17 @@ export function pdiSummary(defects) {
   return { total, resolved, rejected, open, fit: open === 0 }
 }
 
+export function escapeHtml(text) {
+  return String(text)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+}
+
 export function pdiHtml(vin, defects, types) {
   const summary = pdiSummary(defects)
+  const safeVin = escapeHtml(vin)
 
   function typeName(typeId) {
     const t = types.find((t) => t.id === typeId)
@@ -17,9 +26,9 @@ export function pdiHtml(vin, defects, types) {
   const rows = defects
     .map(
       (d, i) =>
-        '<tr><td>' + (i + 1) + '</td><td>' + d.zone + '</td><td>' + typeName(d.typeId) +
-        '</td><td>' + d.severity + '</td><td>' + d.status + '</td><td>' + (d.comment || '') +
-        '</td><td>' + (d.createdAt || '') + '</td></tr>'
+        '<tr><td>' + (i + 1) + '</td><td>' + escapeHtml(d.zone) + '</td><td>' + escapeHtml(typeName(d.typeId)) +
+        '</td><td>' + escapeHtml(d.severity) + '</td><td>' + escapeHtml(d.status) + '</td><td>' + escapeHtml(d.comment || '') +
+        '</td><td>' + escapeHtml(d.createdAt || '') + '</td></tr>'
     )
     .join('')
 
@@ -27,7 +36,7 @@ export function pdiHtml(vin, defects, types) {
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Отчёт PDI — ${vin}</title>
+<title>Отчёт PDI — ${safeVin}</title>
 <style>
 body { font-family: sans-serif; margin: 30px; }
 table { border-collapse: collapse; }
@@ -37,7 +46,7 @@ td, th { border: 1px solid #999; padding: 4px 10px; }
 </style>
 </head>
 <body>
-<h1>Отчёт PDI по кузову ${vin}</h1>
+<h1>Отчёт PDI по кузову ${safeVin}</h1>
 <table>
 <tr><th>N</th><th>Зона</th><th>Тип</th><th>Серьезность</th><th>Статус</th><th>Комментарий</th><th>Дата</th></tr>
 ${rows || '<tr><td colspan="7">дефектов нет</td></tr>'}

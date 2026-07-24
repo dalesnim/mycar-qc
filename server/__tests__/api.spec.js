@@ -23,7 +23,7 @@ const goodDefect = {
 describe('api дефектов', () => {
   it('создание валидного дефекта', () => {
     const db = createDb()
-    const res = db.create(goodDefect)
+    const res = db.create(goodDefect, 'inspector')
     expect(res.status).toBe(201)
     expect(res.body.id).toBeTruthy()
     expect(res.body.status).toBe('new')
@@ -32,7 +32,7 @@ describe('api дефектов', () => {
 
   it('создание без typeId — ошибка 400 и дефект не создаётся', () => {
     const db = createDb()
-    const res = db.create({ vin: 'VIN1', zone: 'капот', x: 1, y: 1 })
+    const res = db.create({ vin: 'VIN1', zone: 'капот', x: 1, y: 1 }, 'inspector')
     expect(res.status).toBe(400)
     expect(res.body.errors).toContain('Выберите тип дефекта')
     expect(db.list().length).toBe(0)
@@ -40,28 +40,28 @@ describe('api дефектов', () => {
 
   it('смена статуса по FSM работает', () => {
     const db = createDb()
-    const id = db.create(goodDefect).body.id
-    expect(db.update(id, { status: 'in_repair' }).status).toBe(200)
-    expect(db.update(id, { status: 'resolved' }).status).toBe(200)
+    const id = db.create(goodDefect, 'inspector').body.id
+    expect(db.update(id, { status: 'in_repair' }, 'master').status).toBe(200)
+    expect(db.update(id, { status: 'resolved' }, 'master').status).toBe(200)
   })
 
   it('недопустимый переход — ошибка 400', () => {
     const db = createDb()
-    const id = db.create(goodDefect).body.id
-    db.update(id, { status: 'in_repair' })
-    db.update(id, { status: 'resolved' })
-    const res = db.update(id, { status: 'new' })
+    const id = db.create(goodDefect, 'inspector').body.id
+    db.update(id, { status: 'in_repair' }, 'master')
+    db.update(id, { status: 'resolved' }, 'master')
+    const res = db.update(id, { status: 'new' }, 'master')
     expect(res.status).toBe(400)
   })
 
   it('удаление несуществующего id — 404 без падения', () => {
     const db = createDb()
-    expect(db.remove('нет такого').status).toBe(404)
+    expect(db.remove('нет такого', 'inspector').status).toBe(404)
   })
 
   it('данные переживают перезапуск', () => {
     const db1 = createDb(file)
-    db1.create(goodDefect)
+    db1.create(goodDefect, 'inspector')
     const db2 = createDb(file)
     expect(db2.list('VIN1').length).toBe(1)
     expect(db2.list('VIN1')[0].zone).toBe('капот')
@@ -94,7 +94,7 @@ describe('отчёт PDI', () => {
     expect(s.fit).toBe(true)
   })
 
-  it('только отклонёные — годен ДА', () => {
+  it('только отклонённые — годен ДА', () => {
     const s = pdiSummary([{ status: 'rejected' }])
     expect(s.fit).toBe(true)
     expect(s.rejected).toBe(1)
