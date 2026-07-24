@@ -36,7 +36,7 @@ export function pdiHtml(vin, defects, types) {
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Отчёт PDI — ${safeVin}</title>
+<title>Отчёт PDI - ${safeVin}</title>
 <style>
 body { font-family: sans-serif; margin: 30px; }
 table { border-collapse: collapse; }
