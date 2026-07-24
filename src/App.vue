@@ -4,11 +4,14 @@ import CarMap from './components/CarMap.vue'
 import DefectCard from './components/DefectCard.vue'
 import DefectList from './components/DefectList.vue'
 import StatusSummary from './components/StatusSummary.vue'
+import PdiChecklist from './components/PdiChecklist.vue'
+import QualityDashboard from './components/QualityDashboard.vue'
 import { loadAll, role, draft, apiError, user, login, logout } from './store'
 
 const loginName = ref('')
 const password = ref('')
 const loginErrors = ref<string[]>([])
+const showDashboard = ref(false)
 
 onMounted(loadAll)
 
@@ -27,9 +30,9 @@ async function doLogin() {
 
 <template>
 <div class="header">
-  <h1>MyCar — контроль качества</h1>
+  <h1>MyCar - контроль качества</h1>
   <div v-if="user" class="user-info">
-    {{ user.name }} — {{ user.role === 'inspector' ? 'инспектор' : 'мастер' }}
+    {{ user.name }} - {{ user.role === 'inspector' ? 'инспектор' : 'мастер' }}
     <button @click="logout">Выйти</button>
   </div>
 </div>
@@ -52,7 +55,6 @@ async function doLogin() {
   <ul v-if="loginErrors.length > 0" class="errors">
     <li v-for="err in loginErrors" :key="err">{{ err }}</li>
   </ul>
-  <p class="hint">инспектор: inspector / 1234, мастер: master / 1234</p>
 </div>
 
 
@@ -62,7 +64,14 @@ async function doLogin() {
       <DefectCard />
       <DefectList/>
       <StatusSummary/>
-      <a href="http://localhost:3000/inspections/VIN1/pdi-report" target="_blank">Отчёт PDI</a>
+      <PdiChecklist/>
+      <p>
+        <a href="http://localhost:3000/inspections/VIN1/pdi-report" target="_blank">Отчёт PDI</a>
+        <button class="dash-btn" @click="showDashboard = !showDashboard">
+          {{ showDashboard ? 'скрыть дашборд' : 'Дашборд качества' }}
+        </button>
+      </p>
+      <QualityDashboard v-if="showDashboard" />
     </div>
   </div>
 </template>

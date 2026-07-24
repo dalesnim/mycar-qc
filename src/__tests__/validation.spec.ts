@@ -16,21 +16,21 @@ function makeDefect(zone: string, typeId: string): Defect {
 }
 
 describe('validateDefect', () => {
-  it('валидный дефект — ошибок нет', () => {
+  it('валидный дефект - ошибок нет', () => {
     expect(validateDefect(makeDefect('капот', 'scratch'))).toEqual([])
   })
 
-  it('без типа — ошибка про тип', () => {
+  it('без типа - ошибка про тип', () => {
     const errors = validateDefect(makeDefect('капот', ''))
     expect(errors).toContain('Выберите тип дефекта')
   })
 
-  it('без зоны — ошибка про зону', () => {
+  it('без зоны - ошибка про зону', () => {
     const errors = validateDefect(makeDefect('', 'scratch'))
     expect(errors).toContain('Укажите зону')
   })
 
-  it('пустой дефект — сразу две ошибки', () => {
+  it('пустой дефект - сразу две ошибки', () => {
     expect(validateDefect(makeDefect('', '')).length).toBe(2)
   })
 

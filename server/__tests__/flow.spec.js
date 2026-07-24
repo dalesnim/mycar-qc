@@ -15,7 +15,7 @@ const goodDefect = {
 }
 
 describe('умный пользователь: делает всё правильно и по порядку', () => {
-  it('инспектор создал -> мастер отремонтировал -> кузов годен', () => {
+  it('инспектор создал -> мастер отремонтировал -> чек-лист пройден -> кузов годен', () => {
     const db = createDb()
     const created = db.create(goodDefect, 'inspector')
     expect(created.status).toBe(201)
@@ -24,7 +24,13 @@ describe('умный пользователь: делает всё правил�
     expect(db.update(id, { status: 'in_repair' }, 'master').status).toBe(200)
     expect(db.update(id, { status: 'resolved' }, 'master').status).toBe(200)
 
-    const summary = pdiSummary(db.list('VIN1'))
+    const beforeChecklist = pdiSummary(db.list('VIN1'), db.getChecklist('VIN1'))
+    expect(beforeChecklist.fit).toBe(false)
+
+    const allPass = db.getChecklist('VIN1').map((c) => ({ ...c, result: 'pass' }))
+    expect(db.saveChecklist('VIN1', allPass, 'inspector').status).toBe(200)
+
+    const summary = pdiSummary(db.list('VIN1'), db.getChecklist('VIN1'))
     expect(summary.fit).toBe(true)
     expect(summary.resolved).toBe(1)
   })
@@ -60,21 +66,21 @@ describe('обычный пользователь: данные норм, но �
     expect(db.remove(id, 'inspector').status).toBe(404)
   })
 
-  it('мастер пытается создать дефект — 403', () => {
+  it('мастер пытается создать дефект - 403', () => {
     const db = createDb()
     const res = db.create(goodDefect, 'master')
     expect(res.status).toBe(403)
     expect(db.list().length).toBe(0)
   })
 
-  it('инспектор пытается перевести статус ремонта — 403', () => {
+  it('инспектор пытается перевести статус ремонта - 403', () => {
     const db = createDb()
     const id = db.create(goodDefect, 'inspector').body.id
     const res = db.update(id, { status: 'in_repair' }, 'inspector')
     expect(res.status).toBe(403)
   })
 
-  it('действие вообще без роли — 403', () => {
+  it('действие вообще без роли - 403', () => {
     const db = createDb()
     expect(db.create(goodDefect).status).toBe(403)
     expect(db.create(goodDefect, 'admin').status).toBe(403)
@@ -82,39 +88,39 @@ describe('обычный пользователь: данные норм, но �
 })
 
 describe('тупой пользователь: null, пробелы и буквы вместо цифр', () => {
-  it('zone = null — понятная ошибка, а не падение сервера', () => {
+  it('zone = null - понятная ошибка, а не падение сервера', () => {
     const db = createDb()
     const res = db.create({ ...goodDefect, zone: null }, 'inspector')
     expect(res.status).toBe(400)
     expect(res.body.errors).toContain('Укажите зону')
   })
 
-  it('zone из одних пробелов — ошибка', () => {
+  it('zone из одних пробелов - ошибка', () => {
     const db = createDb()
     const res = db.create({ ...goodDefect, zone: '    ' }, 'inspector')
     expect(res.status).toBe(400)
   })
 
-  it('буквы вместо координат — ошибка про числа', () => {
+  it('буквы вместо координат - ошибка про числа', () => {
     const db = createDb()
     const res = db.create({ ...goodDefect, x: 'абв', y: 'где' }, 'inspector')
     expect(res.status).toBe(400)
     expect(res.body.errors).toContain('Координаты x и y должны быть числами')
   })
 
-  it('выдуманная серьёзность — ошибка', () => {
+  it('выдуманная серьёзность - ошибка', () => {
     const db = createDb()
     const res = db.create({ ...goodDefect, severity: 'мега плохо' }, 'inspector')
     expect(res.status).toBe(400)
   })
 
-  it('совсем пустое тело запроса — ошибка, не падение', () => {
+  it('совсем пустое тело запроса - ошибка, не падение', () => {
     const db = createDb()
     expect(db.create(null, 'inspector').status).toBe(400)
     expect(db.create({}, 'inspector').status).toBe(400)
   })
 
-  it('patch без данных — ошибка, не падение', () => {
+  it('patch без данных - ошибка, не падение', () => {
     const db = createDb()
     const id = db.create(goodDefect, 'inspector').body.id
     expect(db.update(id, null, 'inspector').status).toBe(400)
@@ -129,7 +135,7 @@ describe('тупой пользователь: null, пробелы и букв�
     expect(res.body.id).toBe(id)
   })
 
-  it('в файле хранилища вместо списка лежит строка — не падаем', () => {
+  it('в файле хранилища вместо списка лежит строка - не падаем', () => {
     const file = os.tmpdir() + '/mycar-bad-shape-' + Date.now() + '.json'
     writeFileSync(file, '{"defects": "я не массив"}')
     const db = createDb(file)

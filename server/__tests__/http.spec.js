@@ -52,17 +52,17 @@ describe('флоу через настоящие http запросы', () => {
     expect(await report.text()).toContain('Отчёт PDI')
   })
 
-  it('запрос без роли — 403', async () => {
+  it('запрос без роли - 403', async () => {
     const res = await req('POST', '/defects', goodDefect)
     expect(res.status).toBe(403)
   })
 
-  it('мастер создаёт дефект — 403', async () => {
+  it('мастер создаёт дефект - 403', async () => {
     const res = await req('POST', '/defects', goodDefect, 'master')
     expect(res.status).toBe(403)
   })
 
-  it('битый json в теле — 400 с текстом, а не 500', async () => {
+  it('битый json в теле - 400 с текстом, а не 500', async () => {
     const res = await fetch(api + '/defects', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-role': 'inspector' },
@@ -73,7 +73,7 @@ describe('флоу через настоящие http запросы', () => {
     expect(data.errors[0]).toContain('JSON')
   })
 
-  it('несуществующий адрес — 404 с текстом', async () => {
+  it('несуществующий адрес - 404 с текстом', async () => {
     const res = await req('GET', '/чего-нет')
     expect(res.status).toBe(404)
     expect(res.data.errors[0]).toContain('Нет такого адреса')
@@ -92,12 +92,12 @@ describe('флоу через настоящие http запросы', () => {
     expect(res.data.password).toBe(undefined)
   })
 
-  it('вход с неправильным паролем — 403', async () => {
+  it('вход с неправильным паролем - 403', async () => {
     const res = await req('POST', '/login', { login: 'inspector', password: 'взлом' })
     expect(res.status).toBe(403)
   })
 
-  it('вход с пустым телом — 403, не падаем', async () => {
+  it('вход с пустым телом - 403, не падаем', async () => {
     const res = await req('POST', '/login', {})
     expect(res.status).toBe(403)
   })

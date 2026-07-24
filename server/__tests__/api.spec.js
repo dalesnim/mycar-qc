@@ -3,6 +3,9 @@ import { existsSync, unlinkSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import { createDb } from '../db.js'
 import { pdiSummary } from '../report.js'
+import { checklistItems } from '../rules.js'
+
+const allPass = checklistItems.map((c) => ({ key: c.key, label: c.label, result: 'pass', comment: '' }))
 
 const file = os.tmpdir() + '/mycar-test-' + Date.now() + '.json'
 
@@ -30,7 +33,7 @@ describe('api дефектов', () => {
     expect(db.list('VIN1').length).toBe(1)
   })
 
-  it('создание без typeId — ошибка 400 и дефект не создаётся', () => {
+  it('создание без typeId - ошибка 400 и дефект не создаётся', () => {
     const db = createDb()
     const res = db.create({ vin: 'VIN1', zone: 'капот', x: 1, y: 1 }, 'inspector')
     expect(res.status).toBe(400)
@@ -45,7 +48,7 @@ describe('api дефектов', () => {
     expect(db.update(id, { status: 'resolved' }, 'master').status).toBe(200)
   })
 
-  it('недопустимый переход — ошибка 400', () => {
+  it('недопустимый переход - ошибка 400', () => {
     const db = createDb()
     const id = db.create(goodDefect, 'inspector').body.id
     db.update(id, { status: 'in_repair' }, 'master')
@@ -54,7 +57,7 @@ describe('api дефектов', () => {
     expect(res.status).toBe(400)
   })
 
-  it('удаление несуществующего id — 404 без падения', () => {
+  it('удаление несуществующего id - 404 без падения', () => {
     const db = createDb()
     expect(db.remove('нет такого', 'inspector').status).toBe(404)
   })
@@ -67,7 +70,7 @@ describe('api дефектов', () => {
     expect(db2.list('VIN1')[0].zone).toBe('капот')
   })
 
-  it('битый файл хранилища — старт с пустого списка', () => {
+  it('битый файл хранилища - старт с пустого списка', () => {
     writeFileSync(file, 'это не json')
     const db = createDb(file)
     expect(db.list().length).toBe(0)
@@ -75,7 +78,7 @@ describe('api дефектов', () => {
 })
 
 describe('отчёт PDI', () => {
-  it('3 дефекта, 2 устранено, 1 новый — годен НЕТ', () => {
+  it('3 дефекта, 2 устранено, 1 новый - годен НЕТ', () => {
     const defects = [
       { status: 'resolved' },
       { status: 'resolved' },
@@ -88,14 +91,14 @@ describe('отчёт PDI', () => {
     expect(s.fit).toBe(false)
   })
 
-  it('нет дефектов — годен ДА', () => {
-    const s = pdiSummary([])
+  it('нет дефектов и чек-лист пройден - годен ДА', () => {
+    const s = pdiSummary([], allPass)
     expect(s.total).toBe(0)
     expect(s.fit).toBe(true)
   })
 
-  it('только отклонённые — годен ДА', () => {
-    const s = pdiSummary([{ status: 'rejected' }])
+  it('только отклонённые и чек-лист пройден - годен ДА', () => {
+    const s = pdiSummary([{ status: 'rejected' }], allPass)
     expect(s.fit).toBe(true)
     expect(s.rejected).toBe(1)
   })

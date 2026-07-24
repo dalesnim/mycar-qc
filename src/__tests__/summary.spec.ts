@@ -16,7 +16,7 @@ function makeDefect(status: Status): Defect {
 }
 
 describe('countByStatus', () => {
-  it('пустой список — все нули', () => {
+  it('пустой список - все нули', () => {
     expect(countByStatus([])).toEqual({
       new: 0,
       in_repair: 0,

@@ -1,6 +1,6 @@
 export const users = [
   { login: 'inspector', password: '1234', name: 'Даулет', role: 'inspector' },
-  { login: 'master', password: '1234', name: 'Ержан', role: 'master' },
+  { login: 'master', password: '1234', name: 'Даулет', role: 'master' },
 ]
 
 export function findUser(login, password) {

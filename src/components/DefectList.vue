@@ -36,7 +36,7 @@ function typeName(typeId: string) {
     <ul class="defect-list">
   <li v-for="d in filtered" :key="d.id" @click="selectedId = d.id"
     :class="{ selected: d.id === selectedId }">
-    <span>{{ d.zone || 'без зоны' }} — {{ typeName(d.typeId) }} — {{ d.severity }}</span>
+    <span>{{ d.zone || 'без зоны' }} - {{ typeName(d.typeId) }} - {{ d.severity }}</span>
     <span class="badge" :class="d.status">{{ d.status }}</span>
   </li>
   <li v-if="filtered.length === 0" class="empty">ничего не найдено</li>
